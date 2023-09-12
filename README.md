@@ -1,5 +1,10 @@
 # AutoBuilderLib
-this library is used to assist with the use of the AutoBuilder application.
+this library is used to assist with the use of the AutoBuilder application. 
+
+#### Vendordep Link
+```
+https://me6262.github.io/AutoBuilderLib.json
+```
 
 
 ## Java Projects
