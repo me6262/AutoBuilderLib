@@ -1,7 +1,6 @@
 plugins {
   id 'cpp'
   id 'java'
-  id 'google-test'
   id 'edu.wpi.first.wpilib.repositories.WPILibRepositoriesPlugin' version '2020.2'
   id 'edu.wpi.first.NativeUtils' version '2024.0.0'
   id 'edu.wpi.first.GradleJni' version '1.0.0'
@@ -28,6 +27,7 @@ dependencies {
     implementation 'edu.wpi.first.wpilibj:wpilibj-java:2023.+'
     implementation 'edu.wpi.first.wpiutil:wpiutil-java:2023.+'
     implementation 'edu.wpi.first.wpimath:wpimath-java:2023.+'
+    implementation 'edu.wpi.first.wpilibNewCommands:wpilibNewCommands-java:2023.+'
     implementation 'edu.wpi.first.wpiunits:wpiunits-java:2023.+'
     implementation 'edu.wpi.first.hal:hal-java:2023.+'
     implementation "org.ejml:ejml-simple:0.41"
@@ -36,17 +36,16 @@ dependencies {
     implementation "com.fasterxml.jackson.core:jackson-databind:2.12.4"
     implementation 'edu.wpi.first.thirdparty.frc2023.opencv:opencv-java:4.6.0-2'
 }
-
 // Set up exports properly
 nativeUtils {
   exportsConfigs {
     // Main library is just default empty. This will export everything
-    Vendor {
+    AutoBuilderLib {
     }
   }
   privateExportsConfigs {
     // Only export explicit symbols from driver library
-    VendorDriver {
+    AutoBuilderLibDriver {
       exportsFile = project.file("src/main/driver/symbols.txt")
     }
   }
@@ -54,7 +53,7 @@ nativeUtils {
 
 model {
   components {
-    Vendor(NativeLibrarySpec) {
+    AutoBuilderLib(NativeLibrarySpec) {
       sources {
         cpp {
           source {
@@ -67,12 +66,12 @@ model {
         }
       }
       binaries.all {
-        lib library: 'VendorDriver', linkage: 'shared'
+        lib library: 'AutoBuilderLibDriver', linkage: 'shared'
       }
       nativeUtils.useRequiredLibrary(it, 'wpilib_shared')
     }
 
-    VendorDriver(JniNativeLibrarySpec) {
+     AutoBuilderLibDriver(JniNativeLibrarySpec) {
       enableCheckTask true
       javaCompileTasks << compileJava
       jniCrossCompileOptions << JniCrossCompileOptions(nativeUtils.wpi.platforms.roborio)
@@ -92,33 +91,6 @@ model {
       }
 
       nativeUtils.useRequiredLibrary(it, "driver_shared")
-    }
-  }
-  testSuites {
-    VendorTest {
-        sources.cpp {
-            source {
-                srcDir 'src/test/native/cpp'
-                include '**/*.cpp'
-            }
-        }
-
-        binaries.all {
-          lib library: 'VendorDriver', linkage: 'shared'
-        }
-
-        nativeUtils.useRequiredLibrary(it, "wpilib_executable_shared", "googletest_static")
-    }
-
-    VendorDriverTest {
-        sources.cpp {
-            source {
-                srcDir 'src/test/driver/cpp'
-                include '**/*.cpp'
-            }
-        }
-
-        nativeUtils.useRequiredLibrary(it, "wpilib_executable_shared", "googletest_static")
     }
   }
 }
