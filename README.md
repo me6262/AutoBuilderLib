@@ -1,25 +1,92 @@
-# WPILib Vendor Template
+# AutoBuilderLib
+this library is used to assist with the use of the AutoBuilder application.
 
-This is the base WPILib vendor template for 2023.
 
-## Layout
+## Java Projects
 
-The build is split into 3 libraries. A java library is built. This has access to all of wpilib, and also can JNI load the driver library.
+### Commands
+in order to actually make the commands detectable by the AutoBuilder, you need to annotate the classes of the commands you would like
 
-A driver library is built. This should contain all low level code you want to access from both C++, Java and any other text based language. This will not work with LabVIEW. This library has access to the WPILib HAL and wpiutil. This library can only export C symbols. It cannot export C++ symbols at all, and all C symbols must be explicitly listed in the symbols.txt file in the driver folder. JNI symbols must be listed in this file as well. This library however can be written in C++. If you attempt to change this library to have access to all of wpilib, you will break JNI access and it will no longer work.
+inline commands cannot be annotated, only full classes
+```java
+...
 
-A native C++ library is built. This has access to all of wpilib, and access to the driver library. This should implment the standard wpilib interfaces.
+@AutonomousModeAnnotation(parameterNames = {"however", "many", "arguments"})
+public class Something extends CommandBase {
+    //this constructor is used when the auto is built due to the num
+    public Something(int arg1, String arg2, double arg3) {
 
-## Customizing
-For Java, the library name will be the folder name the build is started from, so rename the folder to the name of your choosing. 
+    }
 
-For the native impl, you need to change the library name in the exportsConfigs block of build.gradle, the components block of build.gradle, and the taskList input array name in publish.gradle.
+    ...
+}
+```
 
-For the driver, change the library name in privateExportsConfigs, the driver name in components, and the driverTaskList input array name. In addition, you'll need to change the `lib library` in the native C++ impl component, and the JNI library name in the JNI java class.
+### loading autos at runtime
 
-For the maven artifact names, those are all in publish.gradle about 40 lines down.
 
-## Building and editing
-This uses gradle, and uses the same base setup as a standard GradleRIO robot project. This means you build with `./gradlew build`, and can install the native toolchain with `./gradlew installRoboRIOToolchain`. If you open this project in VS Code with the wpilib extension installed, you will get intellisense set up for both C++ and Java.
+#### loading a single auto
+```java 
+AutonomousModesReader reader = new AutonomousModesReader(new DataFileAutonomousModeDataSource("/amode238.txt"));
+Command autoCommand = reader.getAutonomousMode("whateverItsCalled");
+autoCommand.schedule();
 
-By default, this template builds against the latest WPILib development build. To build against the last WPILib tagged release, build with `./gradlew build -PreleaseMode`.
+```
+
+#### using a SendableChooser on SmartDashboard/Shuffleboard
+```java
+...
+
+public class Robot extends TimedRobot {
+  private Command m_autonomousCommand;
+
+  private AutonomousModesReader m_autonomousModesReader;
+  private List<String> autoNames;
+  private SendableChooser<String> autoChooser;
+  private String lastSelectedAuto;
+
+  @Override
+  public void robotInit() {
+    m_autonomousModesReader = new AutonomousModesReader(new DataFileAutonomousModeDataSource("/amode238.txt"));
+    autoNames = m_autonomousModesReader.GetAutoNames();
+    autoChooser = new SendableChooser<String>();
+    autoChooser.setDefaultOption("Default Auto", autoNames.get(0));
+    for (String name : autoNames) {
+      autoChooser.addOption(name, name);
+    }
+    SmartDashboard.putData("Auto choices", autoChooser);
+    lastSelectedAuto = autoChooser.getSelected();
+    m_autonomousCommand = m_autonomousModesReader.getAutonomousMode(lastSelectedAuto);
+
+    
+  }
+
+  @Override
+  public void robotPeriodic() {
+    CommandScheduler.getInstance().run();
+    
+    if (lastSelectedAuto != autoChooser.getSelected()) {
+      m_autonomousCommand = m_autonomousModesReader.getAutonomousMode(autoChooser.getSelected());
+    }
+
+    lastSelectedAuto = autoChooser.getSelected();
+
+  }
+
+  ...
+
+  @Override
+  public void autonomousInit() {
+
+    if (m_autonomousCommand != null) {
+      m_autonomousCommand.schedule();
+    }
+  }
+
+  ...
+}
+
+```
+
+## C++
+**not yet supported**

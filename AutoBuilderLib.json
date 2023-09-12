@@ -4,32 +4,14 @@
     "version": "0.0.1",
     "uuid": "811b13c9-a73b-45bd-9020-bbd186d98c43",
     "mavenUrls": [
-        ":q"
+        "https://me6262.github.io/builds/"
     ],
-    "jsonUrl": "InsertSomeUrlHere",
+    "jsonUrl": "https://me6262.github.io/AutoBuilderLib.json",
     "javaDependencies": [
         {
             "groupId": "org.frc238.lib",
             "artifactId": "AutoBuilderLib-java",
             "version": "0.0.1"
-        }
-    ],
-    "jniDependencies": [
-        {
-            "groupId": "org.frc238.lib",
-            "artifactId": "AutoBuilderLib-driver",
-            "version": "0.0.1",
-            "skipInvalidPlatforms": true,
-            "isJar": false,
-            "validPlatforms": [
-                "windowsx86-64",
-                "windowsx86",
-                "linuxarm64",
-                "linuxx86-64",
-                "linuxathena",
-                "linuxarm32",
-                "osxuniversal"
-            ]
         }
     ],
     "cppDependencies": [
