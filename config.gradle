@@ -4,14 +4,16 @@ nativeUtils.addWpiNativeUtils()
 nativeUtils.withCrossRoboRIO()
 
 nativeUtils {
-  wpi {
-    configureDependencies {
-      wpiVersion = "2024.+"
-      niLibVersion = "2024.+"
-      opencvVersion = "4.6.0-3"
-      googleTestVersion = "1.12.1-1"
+    wpi {
+        configureDependencies {
+            wpiVersion = "2024.+"
+            opencvYear = "frc2024"
+            googleTestYear = "frc2024"
+            niLibVersion = "2024.2.1"
+            opencvVersion = "4.8.0-2"
+            googleTestVersion = "1.14.0-1"
+        }
     }
-  }
 }
 
 nativeUtils.wpi.addWarnings()
@@ -38,7 +40,7 @@ model {
     }
 }
 
-ext.appendDebugPathToBinaries = { binaries->
+ext.appendDebugPathToBinaries = { binaries ->
     binaries.withType(StaticLibraryBinarySpec) {
         if (it.buildType.name.contains('debug')) {
             def staticFileDir = it.staticLibraryFile.parentFile
@@ -73,7 +75,7 @@ ext.appendDebugPathToBinaries = { binaries->
 }
 
 ext.createComponentZipTasks = { components, names, base, type, project, func ->
-    def stringNames = names.collect {it.toString()}
+    def stringNames = names.collect { it.toString() }
     def configMap = [:]
     components.each {
         if (it in NativeLibrarySpec && stringNames.contains(it.name)) {
@@ -164,7 +166,7 @@ ext.includeStandardZipFormat = { task, value ->
                 task.from(binary.sharedLibraryLinkFile) {
                     into nativeUtils.getPlatformPath(binary) + '/shared'
                 }
-            } else  if (binary instanceof StaticLibraryBinarySpec) {
+            } else if (binary instanceof StaticLibraryBinarySpec) {
                 task.dependsOn binary.tasks.createStaticLib
                 task.from(binary.staticLibraryFile) {
                     into nativeUtils.getPlatformPath(binary) + '/static'

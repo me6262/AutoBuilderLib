@@ -131,8 +131,7 @@ public class AutonomousModesReader {
                 switch (parallelType) {
                     case "Parallel":
                         Command parallelGroup;
-                        if (isParallelList.get(0)
-                                == false) { // If there is no parallel command group currently
+                        if (isParallelList.get(0) == false) { // If there is no parallel command group currently
                             // being built
                             parallelGroup = new ParallelCommandGroup(); // Create a new one
                             parallelCommandGroups.set(0, parallelGroup); // Add the command
